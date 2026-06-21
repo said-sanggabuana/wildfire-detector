@@ -246,8 +246,13 @@ def main():
     
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(geojson_data, f, indent=2)
+        
+    latest_path = output_dir / "merapi_burn_scar.geojson"
+    with open(latest_path, "w", encoding="utf-8") as f:
+        json.dump(geojson_data, f, indent=2)
 
     print(f"[SUCCESS] Burn scar GeoJSON report compiled and saved to: {output_path.resolve()}")
+    print(f"[SUCCESS] Static copy saved to: {latest_path.resolve()}")
     print("=== Zero-Cost GitOps Sentinel-2 Wildfire Pipeline End ===")
 
 if __name__ == "__main__":
