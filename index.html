@@ -61,8 +61,8 @@
         <div class="flex items-center space-x-3">
             <!-- Pulsing alert dot -->
             <span class="relative flex h-4 w-4">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-4 w-4 bg-red-600"></span>
+                <span id="alert-pulse-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span id="alert-pulse-dot" class="relative inline-flex rounded-full h-4 w-4 bg-red-600"></span>
             </span>
             <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
                 Mount Merapi Wildfire Observation Portal
@@ -140,6 +140,16 @@
 
         <!-- Leaflet Map Canvas Container -->
         <main class="flex-1 relative bg-slate-950">
+            <!-- Alert Banner -->
+            <div id="alert-banner" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-slate-900/95 backdrop-blur-md border border-emerald-500/30 px-5 py-3 rounded-full shadow-2xl flex items-center space-x-3 transition-all duration-300">
+                <span class="relative flex h-3 w-3">
+                    <span id="banner-pulse-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span id="banner-pulse-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span id="alert-banner-text" class="text-sm font-semibold text-emerald-400 tracking-wide font-sans">
+                    Status: Clear - No active burn geometries found over Merapi
+                </span>
+            </div>
             <div id="map" class="absolute inset-0 h-full w-full"></div>
         </main>
 
@@ -182,13 +192,53 @@
             };
             L.control.layers(baseMaps, null, { position: 'topleft', collapsed: false }).addTo(map);
 
+            // Helper functions to update UI elements based on state
+            function updatePulsingDot(color) {
+                const pingEl = document.getElementById('alert-pulse-ping');
+                const dotEl = document.getElementById('alert-pulse-dot');
+                if (pingEl && dotEl) {
+                    if (color === 'emerald') {
+                        pingEl.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                        dotEl.className = "relative inline-flex rounded-full h-4 w-4 bg-emerald-600";
+                    } else if (color === 'red') {
+                        pingEl.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                        dotEl.className = "relative inline-flex rounded-full h-4 w-4 bg-red-600";
+                    } else {
+                        pingEl.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
+                        dotEl.className = "relative inline-flex rounded-full h-4 w-4 bg-amber-600";
+                    }
+                }
+            }
+
+            function displayAlertBanner(message, isClear = true) {
+                const banner = document.getElementById('alert-banner');
+                const text = document.getElementById('alert-banner-text');
+                const bp = document.getElementById('banner-pulse-ping');
+                const bd = document.getElementById('banner-pulse-dot');
+                if (banner && text) {
+                    text.innerText = message;
+                    if (isClear) {
+                        text.className = "text-sm font-semibold text-emerald-400 tracking-wide font-sans";
+                        banner.className = "absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-slate-900/95 backdrop-blur-md border border-emerald-500/30 px-5 py-3 rounded-full shadow-2xl flex items-center space-x-3 transition-all duration-300";
+                        if (bp) bp.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                        if (bd) bd.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+                    } else {
+                        text.className = "text-sm font-semibold text-red-400 tracking-wide font-sans";
+                        banner.className = "absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-slate-900/95 backdrop-blur-md border border-red-500/30 px-5 py-3 rounded-full shadow-2xl flex items-center space-x-3 transition-all duration-300";
+                        if (bp) bp.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                        if (bd) bd.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
+                    }
+                    banner.classList.remove('hidden');
+                }
+            }
+
             // 4. Asynchronously Load GeoJSON burn scar shapes
             const geojsonPath = './data/merapi_burn_scar.geojson';
             
             fetch(geojsonPath)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('HTTP network response was not ok: ' + response.statusText);
+                        throw new Error(`HTTP network response was not ok: ${response.status} ${response.statusText}`);
                     }
                     return response.json();
                 })
@@ -217,9 +267,14 @@
                     document.getElementById('stat-area').innerText = totalArea > 0 ? totalArea.toFixed(1) : '-';
 
                     if (features.length === 0) {
+                        updatePulsingDot('emerald');
+                        displayAlertBanner("Status: Clear - No active burn geometries found over Merapi", true);
                         return;
                     }
 
+                    // Active burn geometries found: update UI to red state
+                    updatePulsingDot('red');
+                    
                     // 5. Draw GeoJSON features onto Leaflet Map
                     L.geoJSON(data, {
                         style: function(feature) {
@@ -272,10 +327,17 @@
                     }).addTo(map);
                 })
                 .catch(error => {
-                    console.error('Failed to load GeoJSON database features:', error);
-                    document.getElementById('last-updated').innerText = 'State: Idle (No Anomalies)';
+                    console.warn('Warning: Could not fetch wildfire database layers. Fallback to base maps.', error);
+                    
+                    document.getElementById('last-updated').innerText = 'System State: Clear';
                     document.getElementById('stat-anomalies').innerText = '0';
                     document.getElementById('stat-area').innerText = '0.0';
+
+                    // Update header pulsing dot to emerald (Clear)
+                    updatePulsingDot('emerald');
+
+                    // Display alert banner reading "Status: Clear - No active burn geometries found over Merapi"
+                    displayAlertBanner("Status: Clear - No active burn geometries found over Merapi", true);
                 });
         });
     </script>
