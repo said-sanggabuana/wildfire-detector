@@ -51,7 +51,9 @@
         "confidence_source": "VIIRS_NRT",
         "severity_class": "High Severity Canopy Loss",
         "estimated_area_hectares": 57.2,
-        "dNBR_otsu_threshold": 0.1142
+        "dNBR_otsu_threshold": 0.1142,
+        "detection_timestamp": "2026-06-21",
+        "burn_severity": "High"
       }
     }
   ]

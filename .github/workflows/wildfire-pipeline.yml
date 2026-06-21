@@ -6,7 +6,7 @@ on:
   workflow_dispatch:      # Allows manual trigger
 
 jobs:
-  run-detection:
+  poll-and-validate:
     runs-on: ubuntu-latest
     permissions:
       contents: write     # Required to push commits to the repository
@@ -42,6 +42,10 @@ jobs:
         NASA_FIRMS_MAP_KEY: ${{ secrets.NASA_FIRMS_MAP_KEY }}
       run: |
         python run_pipeline.py
+
+    - name: Execute GeoJSON Schema & Geospatial Geofence Tests
+      run: |
+        pytest tests/ -v
 
     - name: Execute GitOps Persistence Loop (Flat-File Commit Trick)
       run: |

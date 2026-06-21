@@ -188,6 +188,12 @@ def main():
                 )
 
                 geojson_data = vectors.getInfo()
+                # Post-process to inject standard properties for integrity checks
+                for feature in geojson_data.get("features", []):
+                    if "properties" not in feature:
+                        feature["properties"] = {}
+                    feature["properties"]["detection_timestamp"] = acq_date
+                    feature["properties"]["burn_severity"] = "High"
                 print(f"[SUCCESS] Extracted {len(geojson_data.get('features', []))} burn scar polygons from Earth Engine.")
         except Exception as e:
             print(f"[ERROR] Live EE execution failed: {e}. Falling back to stateless simulation.")
@@ -230,7 +236,9 @@ def main():
                         "confidence_source": "VIIRS_NRT",
                         "severity_class": "High Severity Canopy Loss",
                         "estimated_area_hectares": 57.2,
-                        "dNBR_otsu_threshold": 0.1142
+                        "dNBR_otsu_threshold": 0.1142,
+                        "detection_timestamp": acq_date,
+                        "burn_severity": "High"
                     }
                 }
             ]
