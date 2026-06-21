@@ -7,6 +7,10 @@ import io
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Force IPv4 network routing for NASA FIRMS queries in dual-stack cloud containers
+import urllib3
+urllib3.util.connection.HAS_IPV6 = False
+
 # Load local .env variables
 load_dotenv()
 
