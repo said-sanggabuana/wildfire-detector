@@ -43,10 +43,11 @@ jobs:
       run: |
         python run_pipeline.py
 
-    - name: Commit and Push Wildfire Anomalies
+    - name: Execute GitOps Persistence Loop (Flat-File Commit Trick)
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        mkdir -p data
         git add data/
         
         # Only commit and push if there are files in data/ to commit
