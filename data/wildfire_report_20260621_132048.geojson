@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "total_records_processed": 3,
+    "detected_fires_count": 1,
+    "alert_triggered": true
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.2437,
+          34.0522
+        ]
+      },
+      "properties": {
+        "bright_ti4": 325.5,
+        "acq_date": "2026-06-21",
+        "acq_time": "1845",
+        "confidence": "high",
+        "frp": 12.5
+      }
+    }
+  ]
+}

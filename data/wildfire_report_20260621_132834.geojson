@@ -1,0 +1,9 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "total_records_processed": 3,
+    "detected_fires_count": 0,
+    "alert_triggered": false
+  },
+  "features": []
+}

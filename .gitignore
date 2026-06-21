@@ -1,6 +1,11 @@
 # Local environment variables, credentials, and data output
 .env
-data/
+data/*
+
+# Whitelist GitOps flat-file database workspace files
+!data/
+!data/.gitkeep
+!data/*.geojson
 
 # Python environment and cache
 venv/
