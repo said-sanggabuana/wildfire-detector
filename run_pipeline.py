@@ -5,10 +5,10 @@ import datetime
 import requests
 import io
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Add src to system path to import Config
-sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
-from config import Config
+# Load local .env variables
+load_dotenv()
 
 # Mock Active Fires fallback if no API key is provided
 def get_mock_active_fires():
@@ -28,16 +28,19 @@ def get_mock_active_fires():
 def main():
     print("=== Zero-Cost GitOps Sentinel-2 Wildfire Pipeline Start ===")
     
+    # Load map key from environment
+    map_key = os.getenv("NASA_FIRMS_MAP_KEY", "").strip()
+    
     # 1. Fetch active fires from NASA FIRMS API
     df_fires = None
-    if not Config.NASA_FIRMS_MAP_KEY:
+    if not map_key:
         print("[INFO] NASA_FIRMS_MAP_KEY not set. Using mock active fire alerts inside Mount Merapi National Park.")
         df_fires = get_mock_active_fires()
     else:
         # Bounding box for Mount Merapi: [110.34, -7.63, 110.52, -7.51]
         bbox = "110.34,-7.63,110.52,-7.51"
         source = "VIIRS_SNPP_NRT"
-        url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{Config.NASA_FIRMS_MAP_KEY}/{source}/{bbox}/1"
+        url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{map_key}/{source}/{bbox}/1"
         
         print(f"[INFO] Ingesting thermal anomalies from NASA FIRMS API for region: {bbox}")
         try:
