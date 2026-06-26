@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "status": "simulated",
+    "method": "Centroid-Buffer-Stateless",
+    "centroid_lat": -7.54406,
+    "centroid_lon": 110.44032,
+    "acq_date": "2026-06-26",
+    "note": "Stateless mock payload to enable continuous zero-cost GitOps runs without GCP billing credentials."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              110.45382,
+              -7.54406
+            ],
+            [
+              110.44702,
+              -7.55576
+            ],
+            [
+              110.43362,
+              -7.55576
+            ],
+            [
+              110.42682,
+              -7.54406
+            ],
+            [
+              110.43362,
+              -7.53236
+            ],
+            [
+              110.44702,
+              -7.53236
+            ],
+            [
+              110.45382,
+              -7.54406
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "description": "Mount Merapi National Park Burn Scar Estimate",
+        "confidence_source": "VIIRS_NRT",
+        "severity_class": "High Severity Canopy Loss",
+        "estimated_area_hectares": 57.2,
+        "dNBR_otsu_threshold": 0.1142,
+        "detection_timestamp": "2026-06-26",
+        "burn_severity": "High"
+      }
+    }
+  ]
+}
